@@ -128,7 +128,7 @@ export function AnalyticsDashboard() {
           })
         }
       } catch (error) {
-        console.error('Error fetching analytics:', error)
+        // Handle error silently
       } finally {
         setIsLoading(false)
       }

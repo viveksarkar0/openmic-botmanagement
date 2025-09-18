@@ -186,7 +186,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
 
         return NextResponse.json(response)
       } else {
-        console.error("[API] Failed to fetch from OpenMic:", openMicResult.error)
         openMicCallLogs = []
       }
     }
@@ -255,7 +254,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
 
     return NextResponse.json(response)
   } catch (error) {
-    console.error("Error fetching call logs:", error)
 
     if (error instanceof Error && error.message.includes("connect")) {
       return NextResponse.json(

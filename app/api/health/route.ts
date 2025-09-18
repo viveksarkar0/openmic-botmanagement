@@ -67,13 +67,11 @@ export async function GET() {
       }
     }
 
-    console.log("[HEALTH] Health check performed:", health)
 
     return NextResponse.json(health, {
       status: schemaCheck.exists ? 200 : 503,
     })
   } catch (error) {
-    console.error("[HEALTH] Health check failed:", error)
 
     return NextResponse.json(
       {

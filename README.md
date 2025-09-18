@@ -1,22 +1,75 @@
-# 🤖 AI Intake Agent - Direct OpenMic Integration
+# 🤖 AI Intake Agent - OpenMic Integration Platform
 
-loom videos -https://www.loom.com/share/5f3d0f24657f48309ab649101238dcaa?sid=3d6b353a-854a-44d5-8b21-e3bb0ab5d3dd
-loom part 2 - https://www.loom.com/share/4b56059e7efa49d8b2349c3e3b3b376e?sid=2e5887a0-8b4e-4b22-bed8-acce8af54996
-loom prt 3 - https://www.loom.com/share/34ca098925994be3ba6b43da45d2acbf?sid=e60eceb5-6922-4eed-9b69-099c1624c1d6
-A production-ready, full-stack Next.js 15 application for managing domain-specific AI intake agents with **direct OpenMic API integration**. Features real-time call log fetching, automatic bot assignment, and comprehensive webhook handling for seamless AI voice agent management.
+<div align="center">
 
-## 🎯 **Key Features**
+![AI Intake Agent](https://img.shields.io/badge/AI-Intake%20Agent-blue?style=for-the-badge&logo=robot)
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-This project provides a complete OpenMic integration solution:
+**A production-ready, enterprise-grade AI voice agent management platform with seamless OpenMic integration**
 
-- ✅ **Multi-Domain Support** - Medical, Legal, and Receptionist bots
-- ✅ **Direct OpenMic Integration** - Real-time call log fetching via API
-- ✅ **Automatic Bot Assignment** - No more manual sync or misassigned calls
-- ✅ **Pre-call Webhooks** - Dynamic data injection before calls
-- ✅ **In-call Function Calls** - Live data retrieval during conversations
-- ✅ **Post-call Webhooks** - Automatic call logging and processing
-- ✅ **Modern UI** - Beautiful interface for bot and call management
-- ✅ **Production Ready** - Clean architecture with proper error handling
+[🎬 Demo Videos](#-demo-videos) • [🚀 Quick Start](#-quick-start) • [📚 Documentation](#-api-documentation) • [🌐 Deploy](#-deployment)
+
+</div>
+
+---
+
+## 📺 Demo Videos
+
+- 🎥 **[Part 1: Project Overview & Setup](https://www.loom.com/share/5f3d0f24657f48309ab649101238dcaa?sid=3d6b353a-854a-44d5-8b21-e3bb0ab5d3dd)**
+- 🎥 **[Part 2: OpenMic Integration](https://www.loom.com/share/4b56059e7efa49d8b2349c3e3b3b376e?sid=2e5887a0-8b4e-4b22-bed8-acce8af54996)**
+- 🎥 **[Part 3: Advanced Features](https://www.loom.com/share/34ca098925994be3ba6b43da45d2acbf?sid=e60eceb5-6922-4eed-9b69-099c1624c1d6)**
+
+## 🌟 Overview
+
+Transform your business communication with our comprehensive AI voice agent platform. Built with Next.js 15 and featuring direct OpenMic API integration, this platform enables seamless management of domain-specific AI intake agents across medical, legal, and receptionist use cases.
+
+## ✨ Key Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🤖 **AI Agent Management**
+- **Multi-Domain Support** - Medical, Legal, Receptionist
+- **Intelligent Bot Assignment** - Automatic call routing
+- **Real-time Synchronization** - Live OpenMic integration
+- **Custom Function Calls** - Domain-specific data retrieval
+
+</td>
+<td width="50%">
+
+### 📊 **Advanced Analytics**
+- **Real-time Call Monitoring** - Live call status tracking
+- **Comprehensive Logging** - Detailed conversation analysis
+- **Performance Metrics** - Success rates and cost tracking
+- **Webhook Processing** - Pre/post-call automation
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 🎨 **Modern Interface**
+- **Responsive Design** - Works on all devices
+- **Dark/Light Mode** - Customizable themes
+- **Interactive Dashboard** - Real-time data visualization
+- **Intuitive Navigation** - User-friendly experience
+
+</td>
+<td width="50%">
+
+### 🚀 **Production Ready**
+- **Enterprise Architecture** - Scalable and maintainable
+- **Type Safety** - Full TypeScript implementation
+- **Error Handling** - Comprehensive error management
+- **Security** - Built-in authentication & validation
+
+</td>
+</tr>
+</table>
 
 ## 🎬 **Quick Demo**
 
@@ -39,14 +92,18 @@ This project provides a complete OpenMic integration solution:
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes, Prisma ORM
-- **Database**: PostgreSQL (SQLite for development)
-- **State Management**: TanStack Query (React Query)
-- **Forms**: React Hook Form
-- **UI Components**: Lucide React icons, React Hot Toast
-- **Validation**: Zod
-- **Development**: ESLint, Prettier, tsx
+<div align="center">
+
+| Category | Technologies |
+|----------|-------------|
+| **Frontend** | ![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js) ![React](https://img.shields.io/badge/React-19-blue?logo=react) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript) ![Tailwind](https://img.shields.io/badge/Tailwind-CSS-38B2AC?logo=tailwind-css) |
+| **Backend** | ![API Routes](https://img.shields.io/badge/API-Routes-green) ![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma) ![Zod](https://img.shields.io/badge/Zod-Validation-blue) |
+| **Database** | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?logo=postgresql&logoColor=white) ![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite) |
+| **UI/UX** | ![Radix UI](https://img.shields.io/badge/Radix-UI-161618?logo=radix-ui) ![Lucide](https://img.shields.io/badge/Lucide-Icons-orange) ![React Hook Form](https://img.shields.io/badge/React-Hook%20Form-EC5990?logo=reacthookform) |
+| **Development** | ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?logo=eslint) ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?logo=prettier) ![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm) |
+| **Deployment** | ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel) ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker) |
+
+</div>
 
 ## 📋 Prerequisites
 
@@ -55,53 +112,61 @@ This project provides a complete OpenMic integration solution:
 - PostgreSQL database (or SQLite for local development)
 - ngrok account for webhook testing
 
-## 🔧 Installation & Setup
+## 🚀 Quick Start
 
-### 1. Clone and Install Dependencies
+### 1️⃣ Clone & Install
 
 ```bash
-git clone <repository-url>
+# Clone the repository
+git clone https://github.com/viveksarkar0/openmic-botmanagement.git
 cd ai-bot
+
+# Install dependencies
 pnpm install
 ```
 
-### 2. Environment Configuration
+### 2️⃣ Environment Setup
 
 Create a `.env` file in the root directory:
 
 ```env
-# Database
+# 🗄️ Database Configuration
 DATABASE_URL="postgresql://user:password@localhost:5432/ai_bot_db"
 # For local development with SQLite:
 # DATABASE_URL="file:./dev.db"
 
-# OpenMic API (required for call log fetching)
+# 🤖 OpenMic API Integration
 OPENMIC_API_KEY="sk_your_openmic_api_key"
 
-# ngrok URL (for webhook and function endpoints)
+# 🌐 Webhook & Function Endpoints
 NEXT_PUBLIC_APP_URL="https://your-ngrok-url.ngrok.io"
+
+# 🔐 Security (for production)
+NEXTAUTH_SECRET="your-super-secret-key"
+NEXTAUTH_URL="https://yourdomain.com"
 ```
 
-### 3. Database Setup
+### 3️⃣ Database Setup
 
 ```bash
 # Generate Prisma client
 pnpm prisma:generate
 
-# Run database migrations
+# Apply database migrations
 pnpm prisma:migrate
 
-# Seed the database with sample data
+# Seed with sample data
 pnpm prisma:seed
 ```
 
-### 4. Start Development Server
+### 4️⃣ Launch Application
 
 ```bash
+# Start development server
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the application.
+🎉 **Success!** Open [http://localhost:3000](http://localhost:3000) to see your AI agent platform.
 
 ## 🌐 ngrok Setup for Webhooks
 
@@ -286,23 +351,103 @@ pnpm prisma:studio    # Open Prisma Studio
 pnpm prisma:generate  # Generate Prisma client
 ```
 
-## 🚀 Deployment
+## 🌐 Deployment
 
-### Environment Variables for Production
+### 🚀 Deploy to Vercel (Recommended)
 
-```env
-DATABASE_URL="postgresql://user:password@host:port/database"
-OPENMIC_API_KEY="your_production_api_key"
-NEXTAUTH_SECRET="your_nextauth_secret"
-NEXTAUTH_URL="https://yourdomain.com"
+<details>
+<summary><strong>📋 Step-by-Step Vercel Deployment</strong></summary>
+
+#### 1️⃣ Prepare Your Repository
+```bash
+# Ensure your code is pushed to GitHub
+git add .
+git commit -m "Ready for deployment"
+git push origin main
 ```
 
-### Deploy to Vercel
+#### 2️⃣ Database Setup (Production)
+```bash
+# Set up a production PostgreSQL database
+# Recommended: Railway, Supabase, or Neon
 
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Set environment variables in Vercel dashboard
-4. Deploy!
+# Example with Neon:
+# 1. Create account at neon.tech
+# 2. Create new database
+# 3. Copy connection string
+```
+
+#### 3️⃣ Vercel Configuration
+1. Go to [vercel.com](https://vercel.com) and sign in
+2. Click "New Project" and import your GitHub repository
+3. Configure build settings:
+   - **Framework Preset**: Next.js
+   - **Build Command**: `pnpm vercel-build`
+   - **Install Command**: `pnpm install`
+
+#### 4️⃣ Environment Variables
+Add these in Vercel Dashboard → Settings → Environment Variables:
+
+```env
+# 🗄️ Database (Production)
+DATABASE_URL="postgresql://user:password@host:port/database?sslmode=require"
+
+# 🤖 OpenMic Integration
+OPENMIC_API_KEY="sk_your_production_openmic_key"
+
+# 🌐 Application URL (will be your Vercel domain)
+NEXT_PUBLIC_APP_URL="https://your-app.vercel.app"
+
+# 🔐 Security
+NEXTAUTH_SECRET="your-super-secret-production-key"
+NEXTAUTH_URL="https://your-app.vercel.app"
+```
+
+#### 5️⃣ Deploy!
+- Click "Deploy" and wait for the build to complete
+- Your app will be live at `https://your-app.vercel.app`
+
+</details>
+
+### 🐳 Docker Deployment
+
+<details>
+<summary><strong>🐳 Docker Setup</strong></summary>
+
+```dockerfile
+# Dockerfile
+FROM node:18-alpine AS base
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --only=production
+
+FROM base AS build
+COPY . .
+RUN npm run build
+
+FROM base AS runtime
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+```bash
+# Build and run
+docker build -t ai-intake-agent .
+docker run -p 3000:3000 --env-file .env ai-intake-agent
+```
+
+</details>
+
+### ☁️ Other Deployment Options
+
+| Platform | Complexity | Cost | Features |
+|----------|------------|------|----------|
+| **Vercel** ⭐ | Easy | Free tier | Serverless, Auto-scaling |
+| **Railway** | Easy | $5/month | Full-stack, Database included |
+| **Render** | Medium | $7/month | Docker support, Auto-deploy |
+| **AWS/GCP** | Hard | Variable | Enterprise features |
 
 ## 🐛 Troubleshooting
 

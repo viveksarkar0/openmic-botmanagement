@@ -4,19 +4,9 @@ import { openmic } from "@/lib/openmic"
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const body = await request.json()
-    console.log("[DEBUG] fetch_visitor_details called with:", JSON.stringify(body, null, 2))
-
-    // Extract visitor ID from various possible formats
     const visitorId = body.id || body.visitor_id || body.visitorId || body.arguments?.id || body.parameters?.id || "789"
-    
-    console.log(`[INFO] Fetching visitor details for ID: ${visitorId}`)
-
-    // Generate mock visitor data (in a real app, this would query your database)
     const visitorDetails = openmic.generateFetchDetails(visitorId, "receptionist")
-
     const responseMessage = `Found visitor ${visitorDetails.name} (Visitor ID: ${visitorDetails.id}). Appointments: ${visitorDetails.appointments?.join(', ') || 'No scheduled appointments'}. Status: ${visitorDetails.status}. Notes: ${visitorDetails.notes}`
-
-    console.log(`[SUCCESS] Visitor details retrieved: ${responseMessage}`)
 
     return NextResponse.json({
       success: true,
@@ -24,9 +14,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       data: visitorDetails
     })
   } catch (error) {
-    console.error("Error in fetch_visitor_details:", error)
-
-    // Fallback response
     const fallbackMessage = "Found visitor Tom Wilson (Visitor ID: 789). Appointments: Today 2 PM. Status: Confirmed. Notes: First visit."
     
     return NextResponse.json({

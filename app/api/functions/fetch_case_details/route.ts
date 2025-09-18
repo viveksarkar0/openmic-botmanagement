@@ -18,9 +18,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       data: caseDetails
     })
   } catch (error) {
-    console.error("Error in fetch_case_details:", error)
-
-    // Fallback response
     const fallbackMessage = "Found case for Mary Johnson (Case ID: 456). Case type: Contract case. Status: Active. Notes: Meeting scheduled."
     
     return NextResponse.json({

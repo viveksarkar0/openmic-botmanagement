@@ -6,11 +6,12 @@ import type { Bot } from "@prisma/client"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse<ApiResponse<Bot>>> {
   try {
+    const { id } = await params
     const bot = await prisma.bot.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: { callLogs: true },
@@ -27,21 +28,21 @@ export async function GET(
       data: bot,
     })
   } catch (error) {
-    console.error("Error fetching bot:", error)
     return NextResponse.json({ success: false, error: "Failed to fetch bot" }, { status: 500 })
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse<ApiResponse<Bot>>> {
   try {
+    const { id } = await params
     const body = await request.json()
     const validatedData = UpdateBotSchema.parse(body)
 
     const currentBot = await prisma.bot.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!currentBot) {
@@ -52,11 +53,10 @@ export async function PATCH(
       const openMicResult = await openmic.updateBot(currentBot.uid, {
         name: validatedData.name,
       })
-      console.log(`[INFO] OpenMic update result:`, openMicResult)
     }
 
     const bot = await prisma.bot.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
     })
 
@@ -65,18 +65,18 @@ export async function PATCH(
       data: bot,
     })
   } catch (error) {
-    console.error("Error updating bot:", error)
     return NextResponse.json({ success: false, error: "Failed to update bot" }, { status: 400 })
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse<ApiResponse>> {
   try {
+    const { id } = await params
     const currentBot = await prisma.bot.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!currentBot) {
@@ -85,18 +85,16 @@ export async function DELETE(
 
     if (currentBot.uid) {
       const openMicResult = await openmic.deleteBot(currentBot.uid)
-      console.log(`[INFO] OpenMic delete result:`, openMicResult)
     }
 
     await prisma.bot.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({
       success: true,
     })
   } catch (error) {
-    console.error("Error deleting bot:", error)
     return NextResponse.json({ success: false, error: "Failed to delete bot" }, { status: 400 })
   }
 }

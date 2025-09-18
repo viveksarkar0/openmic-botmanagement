@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('🌱 Starting seed...')
 
   // Create sample bots
   const medicalBot = await prisma.bot.upsert({
@@ -36,7 +35,6 @@ async function main() {
     }
   })
 
-  console.log('✅ Created bots:', { medicalBot, legalBot, receptionistBot })
 
   // Create sample call logs
   const sampleCallLogs = [
@@ -114,13 +112,10 @@ Bot: You're very welcome, Mr. Brown. We look forward to seeing you on Friday!`,
     })
   }
 
-  console.log('✅ Created sample call logs')
-  console.log('🎉 Seed completed successfully!')
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Seed failed:', e)
     process.exit(1)
   })
   .finally(async () => {

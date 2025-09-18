@@ -20,18 +20,12 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     const { searchParams } = new URL(request.url)
     const sync = searchParams.get("sync") === "true"
 
-    // If sync requested, fetch from OpenMic first
     if (sync) {
-      console.log("[API] Syncing bots from OpenMic...")
       const openMicResult = await openmic.fetchBots()
       
       if (openMicResult.success && openMicResult.data && openMicResult.data.length > 0) {
-        console.log(`[API] Found ${openMicResult.data.length} bots in OpenMic`)
-        
-        // Process and save OpenMic bots
         for (const openMicBot of openMicResult.data) {
           try {
-            console.log(`[API] Processing OpenMic bot:`, JSON.stringify(openMicBot, null, 2))
             
             // Try multiple possible ID fields
             const botUid = openMicBot.id || 
@@ -49,7 +43,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
                            `OpenMic Bot ${botUid}`
             
             if (!botUid) {
-              console.log("[API] Skipping bot with no UID. Available fields:", Object.keys(openMicBot))
               continue
             }
 
@@ -76,7 +69,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
               domain = "medical"
             }
 
-            console.log(`[API] Processing bot: ${botName} (${botUid}) - Domain: ${domain}`)
 
             // Upsert bot
             const savedBot = await prisma.bot.upsert({
@@ -93,14 +85,10 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
               }
             })
             
-            console.log(`[API] Successfully synced bot: ${botName} (DB ID: ${savedBot.id})`)
           } catch (error) {
-            console.error("[API] Error processing OpenMic bot:", error)
-            console.error("[API] Bot data that failed:", openMicBot)
+            // Skip failed bots
           }
         }
-      } else {
-        console.log("[API] No bots found in OpenMic or sync failed")
       }
     }
 
@@ -118,7 +106,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
       data: bots,
     })
   } catch (error) {
-    console.error("Error fetching bots:", error)
 
     if (error instanceof Error && error.message.includes("connect")) {
       return NextResponse.json(
@@ -151,11 +138,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       },
     })
 
-    console.log(`[SUCCESS] Bot created - Local ID: ${bot.id}, OpenMic ID: ${uid}`)
-    console.log(`[INFO] OpenMic Integration:`, {
-      success: openMicResult.success,
-      error: openMicResult.error,
-    })
 
     return NextResponse.json(
       {
@@ -170,7 +152,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       { status: 201 },
     )
   } catch (error) {
-    console.error("Error creating bot:", error)
     return NextResponse.json({ success: false, error: "Failed to create bot" }, { status: 400 })
   }
 }

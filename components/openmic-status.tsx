@@ -24,8 +24,6 @@ export function OpenMicStatus({ onSync, isLoading = false }: OpenMicStatusProps)
       const response = await fetch('/api/health')
       const result = await response.json()
       
-      console.log('[OpenMicStatus] Health check result:', result)
-      
       if (result.success && result.data.openmic) {
         if (result.data.openmic.status === 'connected') {
           setStatus('connected')

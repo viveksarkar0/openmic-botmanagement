@@ -60,7 +60,7 @@ export function CallNotifications() {
           }
         }
       } catch (error) {
-        console.error('Error checking for new calls:', error)
+        // Handle error silently
       }
     }
 

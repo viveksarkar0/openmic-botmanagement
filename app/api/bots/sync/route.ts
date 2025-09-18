@@ -5,8 +5,6 @@ import type { ApiResponse } from "@/lib/types"
 
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse>> {
   try {
-    console.log("[SYNC] Starting bot sync from OpenMic...")
-    
     const openMicResult = await openmic.fetchBots()
     
     if (!openMicResult.success) {
@@ -22,8 +20,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     const errors: string[] = []
 
     if (openMicResult.data && Array.isArray(openMicResult.data)) {
-      console.log(`[SYNC] Processing ${openMicResult.data.length} bots from OpenMic`)
-      
       for (const openMicBot of openMicResult.data) {
         try {
           // Extract bot info from OpenMic response
@@ -59,9 +55,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
               }
             })
             updatedCount++
-            console.log(`[SYNC] Updated existing bot: ${botName} (${botUid})`)
           } else {
-            // Create new bot
             await prisma.bot.create({
               data: {
                 name: botName,
@@ -70,18 +64,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
               }
             })
             savedCount++
-            console.log(`[SYNC] Created new bot: ${botName} (${botUid})`)
           }
 
         } catch (error) {
           const errorMsg = `Error processing bot ${openMicBot.id || openMicBot.name}: ${error}`
-          console.error("[SYNC]", errorMsg)
           errors.push(errorMsg)
         }
       }
     }
 
-    console.log(`[SYNC] Completed: ${savedCount} created, ${updatedCount} updated, ${skippedCount} skipped, ${errors.length} errors`)
 
     return NextResponse.json({
       success: true,
@@ -96,7 +87,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     })
 
   } catch (error) {
-    console.error("[SYNC] Error syncing bots:", error)
     return NextResponse.json({
       success: false,
       error: `Failed to sync bots: ${error instanceof Error ? error.message : error}`

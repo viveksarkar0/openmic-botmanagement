@@ -16,7 +16,6 @@ export class OpenMicService {
 
       return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(`sha256=${expectedSignature}`))
     } catch (error) {
-      console.error("Webhook signature verification failed:", error)
       return false
     }
   }
@@ -29,7 +28,6 @@ export class OpenMicService {
   }): Promise<{ success: boolean; botId?: string; error?: string }> {
     try {
       if (!this.apiKey) {
-        console.warn("[OPENMIC] API key not configured")
         return { success: false, error: "API key not configured" }
       }
 
@@ -55,8 +53,6 @@ export class OpenMicService {
       
       for (const endpoint of possibleEndpoints) {
         try {
-          console.log(`[OPENMIC] Trying endpoint: ${this.baseUrl}/${endpoint}`)
-          
           const response = await fetch(`${this.baseUrl}/${endpoint}`, {
             method: "POST",
             headers: {
@@ -66,27 +62,18 @@ export class OpenMicService {
             body: JSON.stringify(requestBody),
           })
 
-          console.log(`[OPENMIC] Response status for ${endpoint}: ${response.status}`)
-
           if (response.ok) {
             const result = await response.json()
-            console.log(`[OPENMIC] Bot created successfully via ${endpoint}:`, result)
-            
             return { 
               success: true, 
               botId: result.id || result.agent_id || result.uid || result.bot_id || result.agentId
             }
-          } else if (response.status !== 404) {
-            const errorText = await response.text()
-            console.log(`[OPENMIC] Error from ${endpoint}: ${response.status} - ${errorText}`)
           }
         } catch (endpointError) {
-          console.log(`[OPENMIC] Error trying ${endpoint}:`, endpointError)
           continue
         }
       }
       
-      console.log(`[OPENMIC] All API endpoints failed, falling back to manual creation`)
       const generatedUid = `${botData.domain}_${Date.now()}`
       
       return { 
@@ -96,7 +83,6 @@ export class OpenMicService {
       }
       
     } catch (error) {
-      console.error("[OPENMIC] Error creating bot:", error)
       const generatedUid = `${botData.domain}_${Date.now()}`
       return { 
         success: false, 
@@ -113,11 +99,8 @@ export class OpenMicService {
   }): Promise<{ success: boolean; error?: string }> {
     try {
       if (!this.apiKey) {
-        console.warn("[OPENMIC] API key not configured for update")
         return { success: false, error: "API key not configured" }
       }
-
-      console.log(`[OPENMIC] Updating bot ${botId} with data:`, botData)
 
       const response = await fetch(`${this.baseUrl}/bots/${botId}`, {
         method: "PATCH",
@@ -128,20 +111,15 @@ export class OpenMicService {
         body: JSON.stringify(botData),
       })
 
-      console.log(`[OPENMIC] Update response status: ${response.status}`)
-
       if (!response.ok) {
         const errorText = await response.text()
-        console.error(`[OPENMIC] Update error: ${response.status} - ${errorText}`)
         return { success: false, error: `OpenMic API error: ${response.status}` }
       }
 
       const result = await response.json()
-      console.log("[OPENMIC] Bot updated successfully:", result)
 
       return { success: true }
     } catch (error) {
-      console.error("[OPENMIC] Error updating bot:", error)
       return { success: false, error: "Failed to update bot in OpenMic" }
     }
   }
@@ -149,11 +127,8 @@ export class OpenMicService {
   async deleteBot(botId: string): Promise<{ success: boolean; error?: string }> {
     try {
       if (!this.apiKey) {
-        console.warn("[OPENMIC] API key not configured for delete")
         return { success: false, error: "API key not configured" }
       }
-
-      console.log(`[OPENMIC] Deleting bot ${botId}`)
 
       const response = await fetch(`${this.baseUrl}/bots/${botId}`, {
         method: "DELETE",
@@ -162,18 +137,12 @@ export class OpenMicService {
         },
       })
 
-      console.log(`[OPENMIC] Delete response status: ${response.status}`)
-
       if (!response.ok) {
         const errorText = await response.text()
-        console.error(`[OPENMIC] Delete error: ${response.status} - ${errorText}`)
         return { success: false, error: `OpenMic API error: ${response.status}` }
       }
-
-      console.log("[OPENMIC] Bot deleted successfully")
       return { success: true }
     } catch (error) {
-      console.error("[OPENMIC] Error deleting bot:", error)
       return { success: false, error: "Failed to delete bot from OpenMic" }
     }
   }
@@ -288,7 +257,6 @@ When a caller provides their visitor ID (like 789), immediately call the fetch_v
   }): Promise<{ success: boolean; data?: any[]; pagination?: any; error?: string }> {
     try {
       if (!this.apiKey) {
-        console.warn("[OPENMIC] API key not configured for fetching call logs")
         return { success: false, error: "API key not configured" }
       }
 
@@ -306,7 +274,6 @@ When a caller provides their visitor ID (like 789), immediately call the fetch_v
       if (options?.endDate) params.append('to_date', options.endDate) // ISO 8601 format
 
       const url = `${this.baseUrl}/calls${params.toString() ? `?${params.toString()}` : ''}`
-      console.log(`[OPENMIC] Fetching call logs from: ${url}`)
 
       const response = await fetch(url, {
         method: "GET",
@@ -316,11 +283,8 @@ When a caller provides their visitor ID (like 789), immediately call the fetch_v
         },
       })
 
-      console.log(`[OPENMIC] Response status: ${response.status}`)
-
       if (!response.ok) {
         const errorText = await response.text()
-        console.error(`[OPENMIC] API Error: ${response.status} - ${errorText}`)
         return { 
           success: false, 
           error: `OpenMic API error: ${response.status} - ${errorText}` 
@@ -328,10 +292,6 @@ When a caller provides their visitor ID (like 789), immediately call the fetch_v
       }
 
       const result = await response.json()
-      console.log(`[OPENMIC] Call logs fetched successfully:`, {
-        totalCalls: result.calls?.length || 0,
-        pagination: result.pagination
-      })
 
       return { 
         success: true, 
@@ -340,7 +300,6 @@ When a caller provides their visitor ID (like 789), immediately call the fetch_v
       }
       
     } catch (error) {
-      console.error("[OPENMIC] Error fetching call logs:", error)
       return { 
         success: false, 
         error: `Failed to fetch call logs from OpenMic: ${error}` 
@@ -351,11 +310,8 @@ When a caller provides their visitor ID (like 789), immediately call the fetch_v
   async fetchBots(): Promise<{ success: boolean; data?: any[]; error?: string }> {
     try {
       if (!this.apiKey) {
-        console.warn("[OPENMIC] API key not configured for fetching bots")
         return { success: false, error: "API key not configured" }
       }
-
-      console.log(`[OPENMIC] Fetching bots from OpenMic API...`)
 
       // Try multiple possible endpoints for fetching bots
       const possibleEndpoints = [
@@ -368,8 +324,6 @@ When a caller provides their visitor ID (like 789), immediately call the fetch_v
       
       for (const endpoint of possibleEndpoints) {
         try {
-          console.log(`[OPENMIC] Trying endpoint: ${this.baseUrl}/${endpoint}`)
-          
           const response = await fetch(`${this.baseUrl}/${endpoint}`, {
             method: "GET",
             headers: {
@@ -378,13 +332,9 @@ When a caller provides their visitor ID (like 789), immediately call the fetch_v
             },
           })
 
-          console.log(`[OPENMIC] Response status for ${endpoint}: ${response.status}`)
-
           if (response.ok) {
             const result = await response.json()
-            console.log(`[OPENMIC] Raw response from ${endpoint}:`, JSON.stringify(result, null, 2))
             
-            // Handle different response formats
             let bots = []
             if (Array.isArray(result)) {
               bots = result
@@ -395,24 +345,14 @@ When a caller provides their visitor ID (like 789), immediately call the fetch_v
             } else if (result.bots && Array.isArray(result.bots)) {
               bots = result.bots
             } else if (typeof result === 'object' && result !== null) {
-              // If it's a single bot object, wrap it in an array
               bots = [result]
             }
-            
-            console.log(`[OPENMIC] Processed bots from ${endpoint}:`, {
-              totalBots: bots.length,
-              botSample: bots.slice(0, 2)
-            })
 
             return { 
               success: true, 
               data: bots
             }
           } else {
-            const errorText = await response.text()
-            console.error(`[OPENMIC] API Error from ${endpoint}: ${response.status} - ${errorText}`)
-            
-            // Don't continue if we get a 401 (unauthorized) - API key issue
             if (response.status === 401) {
               return {
                 success: false,
@@ -421,20 +361,16 @@ When a caller provides their visitor ID (like 789), immediately call the fetch_v
             }
           }
         } catch (endpointError) {
-          console.error(`[OPENMIC] Error trying ${endpoint}:`, endpointError)
           continue
         }
       }
       
-      // If all endpoints fail, return empty array but mark as successful
-      console.log(`[OPENMIC] All bot endpoints failed, returning empty array`)
       return { 
         success: true, 
         data: []
       }
       
     } catch (error) {
-      console.error("[OPENMIC] Error fetching bots:", error)
       return { 
         success: false, 
         error: `Failed to fetch bots from OpenMic: ${error}` 

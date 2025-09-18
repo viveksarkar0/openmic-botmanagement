@@ -19,10 +19,8 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
 export async function testDatabaseConnection() {
   try {
     await prisma.$connect()
-    console.log("✅ Database connected successfully")
     return true
   } catch (error) {
-    console.error("❌ Database connection failed:", error)
     return false
   }
 }
@@ -33,7 +31,6 @@ export async function checkDatabaseSchema() {
     await prisma.bot.findFirst()
     return { exists: true, error: null }
   } catch (error) {
-    console.error("Database schema check failed:", error)
     return {
       exists: false,
       error: error instanceof Error ? error.message : "Unknown error",
