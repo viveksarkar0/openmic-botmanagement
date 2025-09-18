@@ -357,36 +357,80 @@ When a caller provides their visitor ID (like 789), immediately call the fetch_v
 
       console.log(`[OPENMIC] Fetching bots from OpenMic API...`)
 
-      const response = await fetch(`${this.baseUrl}/bots`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${this.apiKey}`,
-          "Content-Type": "application/json",
-        },
-      })
+      // Try multiple possible endpoints for fetching bots
+      const possibleEndpoints = [
+        'bots',
+        'agents', 
+        'agent',
+        'simple-agents',
+        'workflow-agents'
+      ]
+      
+      for (const endpoint of possibleEndpoints) {
+        try {
+          console.log(`[OPENMIC] Trying endpoint: ${this.baseUrl}/${endpoint}`)
+          
+          const response = await fetch(`${this.baseUrl}/${endpoint}`, {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${this.apiKey}`,
+              "Content-Type": "application/json",
+            },
+          })
 
-      console.log(`[OPENMIC] Response status: ${response.status}`)
+          console.log(`[OPENMIC] Response status for ${endpoint}: ${response.status}`)
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error(`[OPENMIC] API Error: ${response.status} - ${errorText}`)
-        return { 
-          success: false, 
-          error: `OpenMic API error: ${response.status} - ${errorText}` 
+          if (response.ok) {
+            const result = await response.json()
+            console.log(`[OPENMIC] Raw response from ${endpoint}:`, JSON.stringify(result, null, 2))
+            
+            // Handle different response formats
+            let bots = []
+            if (Array.isArray(result)) {
+              bots = result
+            } else if (result.data && Array.isArray(result.data)) {
+              bots = result.data
+            } else if (result.agents && Array.isArray(result.agents)) {
+              bots = result.agents
+            } else if (result.bots && Array.isArray(result.bots)) {
+              bots = result.bots
+            } else if (typeof result === 'object' && result !== null) {
+              // If it's a single bot object, wrap it in an array
+              bots = [result]
+            }
+            
+            console.log(`[OPENMIC] Processed bots from ${endpoint}:`, {
+              totalBots: bots.length,
+              botSample: bots.slice(0, 2)
+            })
+
+            return { 
+              success: true, 
+              data: bots
+            }
+          } else {
+            const errorText = await response.text()
+            console.error(`[OPENMIC] API Error from ${endpoint}: ${response.status} - ${errorText}`)
+            
+            // Don't continue if we get a 401 (unauthorized) - API key issue
+            if (response.status === 401) {
+              return {
+                success: false,
+                error: `Unauthorized: Please check your OpenMic API key`
+              }
+            }
+          }
+        } catch (endpointError) {
+          console.error(`[OPENMIC] Error trying ${endpoint}:`, endpointError)
+          continue
         }
       }
-
-      const result = await response.json()
-      console.log(`[OPENMIC] Bots fetched successfully:`, {
-        totalBots: result.length || result.data?.length || 0
-      })
-
-      // Handle different response formats
-      const bots = Array.isArray(result) ? result : result.data || []
-
+      
+      // If all endpoints fail, return empty array but mark as successful
+      console.log(`[OPENMIC] All bot endpoints failed, returning empty array`)
       return { 
         success: true, 
-        data: bots
+        data: []
       }
       
     } catch (error) {

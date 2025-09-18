@@ -16,6 +16,9 @@ interface CallLogWithBot extends CallLog {
     name: string
     domain: string
   }
+  callerNumber?: string
+  source?: string
+  _searchText?: string
 }
 
 export default function CallLogsPage() {
@@ -24,23 +27,32 @@ export default function CallLogsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [filters, setFilters] = useState<LogFiltersType>({
     search: "",
-    botId: "",
-    domain: "",
-    sentiment: "",
+    botId: "all",
+    domain: "all",
+    sentiment: "all",
   })
   const { toast } = useToast()
 
-  const fetchData = async () => {
+  const fetchData = async (showToast = false) => {
     setIsLoading(true)
     try {
-      const [logsResponse, botsResponse] = await Promise.all([fetch("/api/call-logs?limit=100"), fetch("/api/bots")])
+      // Fetch from both OpenMic and local sources
+      const [logsResponse, botsResponse] = await Promise.all([
+        fetch("/api/call-logs?limit=100&source=both"), 
+        fetch("/api/bots?sync=true")
+      ])
 
       const [logsResult, botsResult] = await Promise.all([logsResponse.json(), botsResponse.json()])
 
       if (logsResult.success && botsResult.success) {
-        // Updated to match the new API response format
         setLogs(logsResult.data || [])
         setBots(botsResult.data || [])
+        if (showToast) {
+          toast({
+            title: "Success",
+            description: "Call logs refreshed successfully",
+          })
+        }
       } else {
         throw new Error("Failed to fetch data")
       }
@@ -57,22 +69,34 @@ export default function CallLogsPage() {
 
   useEffect(() => {
     fetchData()
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchData()
+    }, 30000)
+    
+    return () => clearInterval(interval)
   }, [])
 
   // Filter logs based on current filters
   const filteredLogs = useMemo(() => {
     if (!logs || !Array.isArray(logs)) return []
     return logs.filter((log) => {
-      // Safely access transcript with optional chaining and provide default empty string
-      const transcript = log.transcript || ''
-      
-      // Search filter
-      if (filters.search && !transcript.toLowerCase().includes(filters.search.toLowerCase())) {
-        return false
+      // Search filter - search in transcript, caller number, and bot name
+      if (filters.search && filters.search.trim() !== "") {
+        const searchTerm = filters.search.toLowerCase().trim()
+        const transcript = (log.transcript || '').toLowerCase()
+        const callerNumber = ((log as any).callerNumber || '').toLowerCase()
+        const botName = (log.bot?.name || '').toLowerCase()
+        const searchText = `${transcript} ${callerNumber} ${botName}`
+        
+        if (!searchText.includes(searchTerm)) {
+          return false
+        }
       }
 
       // Bot filter
-      if (filters.botId && log.botId !== filters.botId) {
+      if (filters.botId && filters.botId !== "all" && log.botId !== filters.botId) {
         return false
       }
 
@@ -83,7 +107,7 @@ export default function CallLogsPage() {
       }
 
       // Sentiment filter
-      if (filters.sentiment) {
+      if (filters.sentiment && filters.sentiment !== "all") {
         const metadata = log.metadata as Record<string, any>
         const sentiment = metadata?.sentiment || "neutral"
         if (sentiment !== filters.sentiment) {
@@ -102,13 +126,17 @@ export default function CallLogsPage() {
         const metadata = log.metadata as Record<string, any>
         const duration = metadata?.duration || 0
         const sentiment = metadata?.sentiment || "neutral"
+        const transcript = (log.transcript || '').replace(/"/g, '""')
+        const botName = log.bot?.name || 'Unknown Bot'
+        const botDomain = log.bot?.domain || 'unknown'
+        
         return [
           new Date(log.createdAt).toISOString(),
-          log.bot.name,
-          log.bot.domain,
+          `"${botName.replace(/"/g, '""')}"`,,
+          `"${botDomain}"`,,
           duration.toString(),
           sentiment,
-          `"${log.transcript.replace(/"/g, '""')}"`,
+          `"${transcript}"`,,
         ].join(",")
       }),
     ].join("\n")
@@ -141,11 +169,17 @@ export default function CallLogsPage() {
               <p className="mt-2 text-muted-foreground">View and analyze all AI bot interactions and transcripts</p>
             </div>
             <div className="flex items-center gap-2">
+              {isLoading && (
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Syncing with OpenMic...
+                </div>
+              )}
               <Button variant="outline" onClick={exportLogs} disabled={filteredLogs.length === 0}>
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV
               </Button>
-              <Button variant="outline" onClick={fetchData} disabled={isLoading}>
+              <Button variant="outline" onClick={() => fetchData(true)} disabled={isLoading}>
                 <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
                 Refresh
               </Button>

@@ -2,6 +2,7 @@
 
 loom videos -https://www.loom.com/share/5f3d0f24657f48309ab649101238dcaa?sid=3d6b353a-854a-44d5-8b21-e3bb0ab5d3dd
 loom part 2 - https://www.loom.com/share/4b56059e7efa49d8b2349c3e3b3b376e?sid=2e5887a0-8b4e-4b22-bed8-acce8af54996
+loom prt 3 - https://www.loom.com/share/34ca098925994be3ba6b43da45d2acbf?sid=e60eceb5-6922-4eed-9b69-099c1624c1d6
 A production-ready, full-stack Next.js 15 application for managing domain-specific AI intake agents with **direct OpenMic API integration**. Features real-time call log fetching, automatic bot assignment, and comprehensive webhook handling for seamless AI voice agent management.
 
 ## 🎯 **Key Features**

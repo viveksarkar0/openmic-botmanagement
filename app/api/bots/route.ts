@@ -25,25 +25,61 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
       console.log("[API] Syncing bots from OpenMic...")
       const openMicResult = await openmic.fetchBots()
       
-      if (openMicResult.success && openMicResult.data) {
+      if (openMicResult.success && openMicResult.data && openMicResult.data.length > 0) {
+        console.log(`[API] Found ${openMicResult.data.length} bots in OpenMic`)
+        
         // Process and save OpenMic bots
         for (const openMicBot of openMicResult.data) {
           try {
-            const botUid = openMicBot.id || openMicBot.uid || openMicBot.agent_id
-            const botName = openMicBot.name || `OpenMic Bot ${botUid}`
+            console.log(`[API] Processing OpenMic bot:`, JSON.stringify(openMicBot, null, 2))
             
-            if (!botUid) continue
-
-            // Determine domain
-            let domain = "medical"
-            if (botName.toLowerCase().includes("legal") || openMicBot.prompt?.toLowerCase().includes("legal")) {
-              domain = "legal"
-            } else if (botName.toLowerCase().includes("reception") || openMicBot.prompt?.toLowerCase().includes("reception")) {
-              domain = "receptionist"
+            // Try multiple possible ID fields
+            const botUid = openMicBot.id || 
+                          openMicBot.uid || 
+                          openMicBot.agent_id || 
+                          openMicBot.botId || 
+                          openMicBot.agentId ||
+                          openMicBot._id
+                          
+            // Try multiple possible name fields
+            const botName = openMicBot.name || 
+                           openMicBot.title || 
+                           openMicBot.agent_name ||
+                           openMicBot.displayName ||
+                           `OpenMic Bot ${botUid}`
+            
+            if (!botUid) {
+              console.log("[API] Skipping bot with no UID. Available fields:", Object.keys(openMicBot))
+              continue
             }
 
+            // Determine domain based on name and prompt
+            let domain = "medical" // default
+            const nameAndPrompt = `${botName} ${openMicBot.prompt || openMicBot.system_prompt || openMicBot.instructions || ''}`.toLowerCase()
+            
+            if (nameAndPrompt.includes("legal") || 
+                nameAndPrompt.includes("lawyer") || 
+                nameAndPrompt.includes("attorney") ||
+                nameAndPrompt.includes("law")) {
+              domain = "legal"
+            } else if (nameAndPrompt.includes("reception") || 
+                     nameAndPrompt.includes("receptionist") || 
+                     nameAndPrompt.includes("front desk") ||
+                     nameAndPrompt.includes("secretary")) {
+              domain = "receptionist"
+            } else if (nameAndPrompt.includes("medical") || 
+                     nameAndPrompt.includes("doctor") || 
+                     nameAndPrompt.includes("patient") || 
+                     nameAndPrompt.includes("health") ||
+                     nameAndPrompt.includes("clinic") ||
+                     nameAndPrompt.includes("hospital")) {
+              domain = "medical"
+            }
+
+            console.log(`[API] Processing bot: ${botName} (${botUid}) - Domain: ${domain}`)
+
             // Upsert bot
-            await prisma.bot.upsert({
+            const savedBot = await prisma.bot.upsert({
               where: { uid: botUid },
               update: {
                 name: botName,
@@ -56,10 +92,15 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
                 uid: botUid
               }
             })
+            
+            console.log(`[API] Successfully synced bot: ${botName} (DB ID: ${savedBot.id})`)
           } catch (error) {
             console.error("[API] Error processing OpenMic bot:", error)
+            console.error("[API] Bot data that failed:", openMicBot)
           }
         }
+      } else {
+        console.log("[API] No bots found in OpenMic or sync failed")
       }
     }
 

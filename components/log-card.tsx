@@ -5,7 +5,7 @@ import type { CallLog } from "@prisma/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown, ChevronRight, MessageSquare, Clock, BotIcon, Hash } from "lucide-react"
+import { ChevronDown, ChevronRight, MessageSquare, Clock, BotIcon, Hash, Zap, Database, Webhook } from "lucide-react"
 import { formatDistanceToNow, format } from "date-fns"
 
 interface CallLogWithBot extends CallLog {
@@ -110,12 +110,81 @@ export function LogCard({ log }: LogCardProps) {
                 </div>
               </div>
 
-              {/* Metadata */}
-              {Object.keys(metadata).length > 0 && (
+              {/* Function Call Results */}
+              {metadata?.functionCalls && (
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Call Metadata</h4>
+                  <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-blue-500" />
+                    Function Call Results
+                  </h4>
+                  <div className="space-y-2">
+                    {Array.isArray(metadata.functionCalls) ? metadata.functionCalls.map((call: any, index: number) => (
+                      <div key={index} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                        <div className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">
+                          Function: {call.name || 'Unknown'}
+                        </div>
+                        <div className="text-sm">
+                          <strong>Input:</strong> {JSON.stringify(call.arguments || call.input, null, 2)}
+                        </div>
+                        <div className="text-sm mt-1">
+                          <strong>Result:</strong> {typeof call.result === 'object' ? JSON.stringify(call.result, null, 2) : call.result}
+                        </div>
+                      </div>
+                    )) : (
+                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                        <pre className="text-sm">{JSON.stringify(metadata.functionCalls, null, 2)}</pre>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Pre-call Data */}
+              {metadata?.preCallData && (
+                <div>
+                  <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+                    <Database className="h-4 w-4 text-green-500" />
+                    Pre-call Data Retrieved
+                  </h4>
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                    <pre className="text-sm">{JSON.stringify(metadata.preCallData, null, 2)}</pre>
+                  </div>
+                </div>
+              )}
+
+              {/* Webhook Processing */}
+              {(metadata?.webhookProcessed || metadata?.processedAt) && (
+                <div>
+                  <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+                    <Webhook className="h-4 w-4 text-purple-500" />
+                    Webhook Processing
+                  </h4>
+                  <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
+                    <div className="text-sm space-y-1">
+                      {metadata.processedAt && (
+                        <div><strong>Processed At:</strong> {new Date(metadata.processedAt).toLocaleString()}</div>
+                      )}
+                      {metadata.webhookProcessed && (
+                        <div><strong>Status:</strong> Successfully processed by post-call webhook</div>
+                      )}
+                      {metadata.callId && (
+                        <div><strong>Call ID:</strong> {metadata.callId}</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Other Metadata */}
+              {Object.keys(metadata).filter(key => 
+                !['functionCalls', 'preCallData', 'webhookProcessed', 'processedAt', 'callId'].includes(key)
+              ).length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Additional Metadata</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {Object.entries(metadata).map(([key, value]) => (
+                    {Object.entries(metadata)
+                      .filter(([key]) => !['functionCalls', 'preCallData', 'webhookProcessed', 'processedAt', 'callId'].includes(key))
+                      .map(([key, value]) => (
                       <div key={key} className="bg-card border rounded-lg p-3">
                         <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                           {key.replace(/([A-Z])/g, " $1").trim()}

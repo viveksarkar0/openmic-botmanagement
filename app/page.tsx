@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Navbar } from "@/components/navbar"
 import { DatabaseStatus } from "@/components/database-status"
+import { AnalyticsDashboard } from "@/components/analytics-dashboard"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Bot, MessageSquare, Activity, Clock, AlertCircle } from "lucide-react"
 import Link from "next/link"
@@ -166,6 +167,12 @@ export default function DashboardPage() {
               <p className="text-xs text-muted-foreground">Last 24 hours</p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Analytics Dashboard */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Analytics Overview</h2>
+          <AnalyticsDashboard />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

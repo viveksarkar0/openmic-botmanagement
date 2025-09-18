@@ -5,8 +5,10 @@ import type { Bot } from "@prisma/client"
 import { Navbar } from "@/components/navbar"
 import { BotForm } from "@/components/bot-form"
 import { BotTable } from "@/components/bot-table"
+import { OpenMicStatus } from "@/components/openmic-status"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BotIcon, Activity, MessageSquare } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { BotIcon, Activity, MessageSquare, RefreshCw } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface BotWithCount extends Bot {
@@ -20,20 +22,27 @@ export default function BotsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
 
-  const fetchBots = async () => {
+  const fetchBots = async (sync = false) => {
     try {
-      const response = await fetch("/api/bots")
+      const url = sync ? "/api/bots?sync=true" : "/api/bots"
+      const response = await fetch(url)
       const result = await response.json()
 
       if (result.success) {
         setBots(result.data)
+        if (sync) {
+          toast({
+            title: "Success",
+            description: "Bots synchronized with OpenMic",
+          })
+        }
       } else {
         throw new Error(result.error)
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch bots",
+        description: sync ? "Failed to sync bots" : "Failed to fetch bots",
         variant: "destructive",
       })
     } finally {
@@ -59,8 +68,24 @@ export default function BotsPage() {
               <h1 className="text-3xl font-bold text-foreground text-balance">Bot Management</h1>
               <p className="mt-2 text-muted-foreground">Create and manage your AI intake bots for different domains</p>
             </div>
-            <BotForm onSuccess={fetchBots} />
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => fetchBots(true)}
+                disabled={isLoading}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+                Sync with OpenMic
+              </Button>
+              <BotForm onSuccess={() => fetchBots()} />
+            </div>
           </div>
+        </div>
+
+        {/* OpenMic Status */}
+        <div className="mb-6">
+          <OpenMicStatus onSync={() => fetchBots(true)} isLoading={isLoading} />
         </div>
 
         {/* Stats Cards */}
